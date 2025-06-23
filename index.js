@@ -4,7 +4,6 @@ const express = require('express');
 const db = require('./db');
 
 const app = express();
-const port = 3000;
 
 // 1. Importar os arquivos de rotas
 const usuariosRoutes = require('./routes/usuarios');
@@ -36,6 +35,11 @@ app.use('/orcamentos', orcamentosRoutes);
 //   console.log(`API rodando em https://localhost:${port}`);
 // });
 
-app.listen(port, () => {
-  console.log(`API rodando na porta ${port}`);
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`API rodando na porta ${PORT}`);
+});
+
+app.get('/', (req, res) => {
+  res.send('API TiAjuda funcionando!');
 });
