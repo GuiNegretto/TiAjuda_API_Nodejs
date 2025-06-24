@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db'); // ou o caminho do seu módulo de conexão com o banco
+const { sendEmail } = require('../services/emailService'); // Importa a função sendEmail do novo serviço!
+
 
 // GET: Lista todos os orçamentos
 router.get('/', async (req, res) => {
