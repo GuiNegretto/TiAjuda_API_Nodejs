@@ -42,7 +42,7 @@ left join orcamentos o
 on s.id =  o.id_servico
 inner join usuarios u
 on s.id_cliente = u.id
-where coalesce (s.status, 'C' ) != 'L'
+where coalesce (s.status, 'C' ) != 'C'
 and s.id_cliente = $1`, [id]);
 
         res.json(result.rows);
