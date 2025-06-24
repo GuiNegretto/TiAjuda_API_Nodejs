@@ -161,7 +161,7 @@ router.get('/:id/confirmar_pag', async (req, res) => {
     try {
       const result = await db.query(
         'UPDATE orcamentos SET status = $1 WHERE id = $2 RETURNING *',
-        ['confirmado', id]
+        ['F', id]
       );
   
       if (result.rows.length === 0) {
