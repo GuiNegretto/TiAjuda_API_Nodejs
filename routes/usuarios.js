@@ -89,7 +89,7 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   const { id } = req.params;
   const { nome, email, senha, tipo } = req.body;
-  if (!nome || !email || !senha || !tipo) {
+  if (!nome || !email || !senha) {
     return res.status(400).send('Nome, email, senha e tipo são obrigatórios');
   }
   try {

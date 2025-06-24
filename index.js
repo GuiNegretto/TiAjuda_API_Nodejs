@@ -9,6 +9,7 @@ const app = express();
 const usuariosRoutes = require('./routes/usuarios');
 const servicosRoutes = require('./routes/servicos');
 const orcamentosRoutes = require('./routes/orcamentos');  
+const avaliacoesRoutes = require('./routes/avaliacoes');  
 
 
 app.use(express.json());
@@ -19,6 +20,7 @@ app.use(formatDatesMiddleware);
 app.use('/usuarios', usuariosRoutes);
 app.use('/servicos', servicosRoutes);
 app.use('/orcamentos', orcamentosRoutes);
+app.use('/avaliacoes', avaliacoesRoutes);
 
 // Para o login, você pode ter uma rota base
 
