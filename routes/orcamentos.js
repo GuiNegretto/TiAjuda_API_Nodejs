@@ -91,6 +91,85 @@ router.put('/:id', async (req, res) => {
     }
 });
 
+router.put('/:id/aprovado', async (req, res) => {
+    const { id } = req.params;
+    const { form_pag } = req.body;
+
+    try {
+        const result = await db.query(
+            `UPDATE orcamentos SET status = 'A', form_pag = $1 WHERE id = $2 RETURNING *`,
+            [form_pag, id]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Orçamento não encontrado.' });
+        }
+    
+        const orcamento = result.rows[0];
+    
+        // Opcional: buscar informações do usuário associado
+        const usuarioResult = await db.query('SELECT * FROM usuarios WHERE id = $1', [orcamento.usuario_id]);
+        if (usuarioResult.rows.length === 0) {
+          return res.status(404).json({ error: 'Usuário não encontrado.' });
+        }
+    
+        const usuario = usuarioResult.rows[0];
+    
+        // Montar link para confirmação
+        const confirmLink = `https://seusite.com/api/orcamentos/${id}/confirmar_pag`;
+    
+        // Montar e-mail
+        const subject = 'Detalhes do pagamento do seu orçamento';
+        const htmlBody = `
+          <p>Olá <strong>${usuario.nome}</strong>,</p>
+          <p>Segue abaixo os dados do seu orçamento:</p>
+          <ul>
+            <li><strong>Valor:</strong> R$ ${orcamento.valor}</li>
+            <li><strong>Observação:</strong> ${orcamento.observacao || 'Nenhuma'}</li>
+          </ul>
+          <p>Para confirmar o pagamento, clique no botão abaixo:</p>
+          <p><a href="${confirmLink}" style="background: #28a745; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Confirmar Pagamento</a></p>
+          <p>Atenciosamente,<br/>Equipe TiaAjuda</p>
+        `;
+    
+        const emailResult = await sendEmail(usuario.email, subject, htmlBody);
+    
+        if (emailResult.success) {
+          res.json({
+            message: 'E-mail enviado com sucesso!',
+            email: usuario.email,
+            previewUrl: emailResult.previewUrl
+          });
+        } else {
+          res.status(500).json({ error: 'Erro ao enviar e-mail.', detail: emailResult.error });
+        }
+    
+      } catch (err) {
+        console.error('Erro ao enviar e-mail de pagamento:', err);
+        res.status(500).json({ error: 'Erro no servidor.' });
+      }
+});
+
+router.get('/:id/confirmar_pag', async (req, res) => {
+    const { id } = req.params;
+  
+    try {
+      const result = await db.query(
+        'UPDATE orcamentos SET status = $1 WHERE id = $2 RETURNING *',
+        ['confirmado', id]
+      );
+  
+      if (result.rows.length === 0) {
+        return res.status(404).send('Orçamento não encontrado.');
+      }
+  
+      res.send(`<h2>Pagamento confirmado com sucesso!</h2><p>Obrigado por confirmar.</p>`);
+    } catch (err) {
+      console.error('Erro ao confirmar pagamento:', err);
+      res.status(500).send('Erro ao confirmar pagamento.');
+    }
+  });
+
 // DELETE: Remove um orçamento
 router.delete('/:id', async (req, res) => {
     const { id } = req.params;

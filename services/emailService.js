@@ -33,7 +33,7 @@ const transporter = nodemailer.createTransport({
 async function sendEmail(to, subject, htmlContent) {
     try {
         const mailOptions = {
-            from: `"Sua API Node.js" <${process.env.EMAIL_USER}>`, // Remetente
+            from: '"TiaAjuda App" <naoresponder@tiaajuda.com>', // Remetente
             to: to,
             subject: subject,
             html: htmlContent
