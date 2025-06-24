@@ -17,7 +17,7 @@ router.get('/', async (req, res) => {
 router.get('/id_tecnico/:id', async (req, res) => {
     const { id } = req.params;
     try {
-        const result = await db.query(`SELECT o.*, s.status, s.id as id_servico, s.titulo as titulo_servico, u.nome as nome_cliente
+        const result = await db.query(`SELECT o.*, coalesce(o.status, 'C'), s.id as id_servico, s.titulo as titulo_servico, u.nome as nome_cliente
             FROM servicos s 
             left join orcamentos o 
             on s.id =  o.id_servico 

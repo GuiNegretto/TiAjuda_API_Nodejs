@@ -56,6 +56,37 @@ router.get('/:id', async (req, res) => {
     }
 });
 
+router.post('/atendimento/', async (req, res) => {
+    const { id_servico, id_tecnico, descricao, status } = req.body;
+  
+    try {
+      const result = await db.query(
+        `INSERT INTO atendimentos (id_servico, id_tecnico, descricao, status)
+         VALUES ($1, $2, $3, $4) RETURNING *`,
+        [id_servico, id_tecnico, descricao, status || 'pendente']
+      );
+  
+      res.status(201).json(result.rows[0]);
+    } catch (error) {
+      console.error('Erro ao criar atendimento:', error);
+      res.status(500).json({ erro: 'Erro ao criar atendimento' });
+    }
+  });
+  
+  router.get('/atendimento/:id_tecnico', async (req, res) => {
+    const { id } = req.params;
+    try {
+      const result = await db.query(
+        `SELECT * FROM servicos_atendimento where id_tecnico = $1 ORDER BY data_atendimento DESC`, [id]
+      );
+  
+      res.json(result.rows);
+    } catch (error) {
+      console.error('Erro ao listar atendimentos:', error);
+      res.status(500).json({ erro: 'Erro ao listar atendimentos' });
+    }
+  });
+
 router.get('/id_cliente/:id', async (req, res) => {
   const { id } = req.params;
 
