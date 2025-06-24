@@ -108,7 +108,10 @@ router.put('/:id/aprovado', async (req, res) => {
         const orcamento = result.rows[0];
     
         // Opcional: buscar informações do usuário associado
-        const usuarioResult = await db.query('SELECT * FROM usuarios WHERE id = $1', [orcamento.usuario_id]);
+        const usuarioResult = await db.query(`SELECT u.* FROM usuarios u 
+            inner join servicos s 
+            on s.id_cliente = u.id 
+            WHERE s.id = $1`, [orcamento.id_servico]);
         if (usuarioResult.rows.length === 0) {
           return res.status(404).json({ error: 'Usuário não encontrado.' });
         }
