@@ -121,7 +121,7 @@ router.put('/:id/aprovado', async (req, res) => {
         const usuario = usuarioResult.rows[0];
     
         // Montar link para confirmação
-        const confirmLink = `https://dashboard.render.com/orcamentos/${id}/confirmar_pag`;
+        const confirmLink = `https://tiajuda-api-nodejs.onrender.com/orcamentos/${id}/confirmar_pag`;
     
         // Montar e-mail
         const subject = 'Detalhes do pagamento do seu orçamento';
