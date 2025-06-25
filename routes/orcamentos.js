@@ -167,6 +167,11 @@ router.get('/:id/confirmar_pag', async (req, res) => {
       if (result.rows.length === 0) {
         return res.status(404).send('Orçamento não encontrado.');
       }
+
+      result = await db.query(
+        'UPDATE servicos SET status = $1 WHERE id = $2',
+        ['A', result.id_servico]
+      );
   
       res.send(`<h2>Pagamento confirmado com sucesso!</h2><p>Obrigado por confirmar.</p>`);
     } catch (err) {

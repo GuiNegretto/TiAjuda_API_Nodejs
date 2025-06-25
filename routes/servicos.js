@@ -77,7 +77,7 @@ router.post('/atendimento/', async (req, res) => {
     const { id } = req.params;
     try {
       const result = await db.query(
-        `SELECT * FROM servicos_atendimento where id_tecnico = $1 ORDER BY data_atendimento DESC`, [id]
+        `SELECT * FROM servicos_atendimento where status = 'A' ORDER BY data_atendimento DESC`//, [id]
       );
   
       res.json(result.rows);
