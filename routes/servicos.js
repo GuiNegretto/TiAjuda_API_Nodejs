@@ -98,7 +98,7 @@ router.post('/atendimento/', async (req, res) => {
 
     try {
         const result = await db.query(
-            `UPDATE servicos_atendimento SET data_atendimento = now(), descricao_atendimento = $1, status = 'F' WHERE id = $2 RETURNING *`,
+            `UPDATE servicos_atendimento SET data_atendimento = now(), descricao_atendimento = $1, status = 'F' WHERE id_servico = $2 RETURNING *`,
             [ descricao, id]
         );
 
