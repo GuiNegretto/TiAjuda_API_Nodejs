@@ -39,7 +39,7 @@ router.get('/id_tecnico/:id', async (req, res) => {
 router.get('/id_cliente/:id', async (req, res) => {
     const { id } = req.params;
     try {
-        const result = await db.query(`SELECT o.status, s.id as id_servico, s.titulo as titulo_servico, u.nome as nome_cliente FROM servicos s 
+        const result = await db.query(`SELECT o.id, o.status, s.id as id_servico, s.titulo as titulo_servico, u.nome as nome_cliente FROM servicos s 
 left join orcamentos o 
 on s.id =  o.id_servico
 inner join usuarios u
