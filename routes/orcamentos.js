@@ -156,33 +156,39 @@ router.put('/:id/aprovado', async (req, res) => {
 });
 
 router.get('/:id/confirmar_pag', async (req, res) => {
-    const { id } = req.params;
-  
-    try {
-      const result = await db.query(
-        'UPDATE orcamentos SET status = $1 WHERE id = $2 RETURNING *',
-        ['F', id]
-      );
-  
-      if (result.rows.length === 0) {
-        return res.status(404).send('Orçamento não encontrado.');
-      }
-      const id_servico = result.id_servico;
-      const id_tecnico = result.id_tecnico;
+  const { id } = req.params;
 
-      result = await db.query(
-        'UPDATE servicos SET status = $1 WHERE id = $2',
-        ['A', id_servico]
-      );
+  try {
+    // Atualiza o orçamento
+    const resultOrcamento = await db.query(
+      'UPDATE orcamentos SET status = $1 WHERE id = $2 RETURNING *',
+      ['F', id]
+    );
 
-      processarPagamento(id_servico, id_tecnico);
-  
-      res.send(`<h2>Pagamento confirmado com sucesso!</h2><p>Obrigado por confirmar.</p>`);
-    } catch (err) {
-      console.error('Erro ao confirmar pagamento:', err);
-      res.status(500).send('Erro ao confirmar pagamento.');
+    if (resultOrcamento.rows.length === 0) {
+      return res.status(404).send('Orçamento não encontrado.');
     }
-  });
+
+    const id_servico = resultOrcamento.rows[0].id_servico;
+    const id_tecnico = resultOrcamento.rows[0].id_tecnico;
+
+    // Atualiza o serviço
+    const resultServico = await db.query(
+      'UPDATE servicos SET status = $1 WHERE id = $2 RETURNING *',
+      ['A', id_servico]
+    );
+
+    // Processa o pagamento
+    processarPagamento(id_servico, id_tecnico);
+
+    // Resposta
+    res.send(`<h2>Pagamento confirmado com sucesso!</h2><p>Obrigado por confirmar.</p>`);
+  } catch (err) {
+    console.error('Erro ao confirmar pagamento:', err);
+    res.status(500).send('Erro ao confirmar pagamento.');
+  }
+});
+
 
   async function processarPagamento(id_servico, id_tecnico) {
     try {
