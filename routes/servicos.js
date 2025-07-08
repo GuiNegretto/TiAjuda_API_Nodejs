@@ -61,9 +61,9 @@ router.post('/atendimento/', async (req, res) => {
   
     try {
       const result = await db.query(
-        `INSERT INTO atendimentos (id_servico, id_tecnico, descricao, status)
+        `INSERT INTO servicos_atendimento (id_servico, id_tecnico, descricao, status)
          VALUES ($1, $2, $3, $4) RETURNING *`,
-        [id_servico, id_tecnico, descricao, status || 'pendente']
+        [id_servico, id_tecnico, descricao, status || 'A']
       );
   
       res.status(201).json(result.rows[0]);
@@ -86,6 +86,31 @@ router.post('/atendimento/', async (req, res) => {
       res.status(500).json({ erro: 'Erro ao listar atendimentos' });
     }
   });
+
+  router.put('/atendimento/:id', async (req, res) => {
+    const { id } = req.params;
+    const { descricao } = req.body;
+
+    // Validação
+    if (!descricao) {
+        return res.status(400).json({ error: 'O campo "descricao" é obrigatório.' });
+    }
+
+    try {
+        const result = await db.query(
+            `UPDATE servicos_atendimento SET data_atendimento = now(), descricao_atendimento = $1, status = 'F' WHERE id = $2 RETURNING *`,
+            [ descricao, id]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Atendimento não encontrado para atualização.' });
+        }
+        res.status(200).json(result.rows[0]);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Erro no servidor');
+    }
+});
 
 router.get('/id_cliente/:id', async (req, res) => {
   const { id } = req.params;

@@ -168,17 +168,14 @@ router.get('/:id/confirmar_pag', async (req, res) => {
         return res.status(404).send('Orçamento não encontrado.');
       }
       const id_servico = result.id_servico;
+      const id_tecnico = result.id_tecnico;
 
       result = await db.query(
         'UPDATE servicos SET status = $1 WHERE id = $2',
         ['A', id_servico]
       );
 
-      result = await db.query(
-        `( id_servico, status)
-VALUES($1, 'A')`,
-        [id_servico]
-      );
+      processarPagamento(id_servico, id_tecnico);
   
       res.send(`<h2>Pagamento confirmado com sucesso!</h2><p>Obrigado por confirmar.</p>`);
     } catch (err) {
@@ -186,6 +183,19 @@ VALUES($1, 'A')`,
       res.status(500).send('Erro ao confirmar pagamento.');
     }
   });
+
+  async function processarPagamento(id_servico, id_tecnico) {
+    try {
+      await db.query(
+        `INSERT INTO servicos_atendimento (id_servico, id_tecnico, descricao, status)
+         VALUES ($1, $2, (select descricao from servicos where id = $1), $3)`,
+        [id_servico, id_tecnico, 'A']
+      );
+    } catch (error) {
+      console.error('Erro ao criar atendimento:', error);
+    }
+  }
+  
 
 // DELETE: Remove um orçamento
 router.delete('/:id', async (req, res) => {
